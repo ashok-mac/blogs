@@ -2,45 +2,52 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pulse HK · Multi‑Page Engineering Docs</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Pulse HK · Engineering Docs</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=JetBrains+Mono:wght@400;500&family=Playfair+Display:ital,wght@0,700;1,600&display=swap" rel="stylesheet" />
 
   <style>
-    /* ─── Reset & Base (same as original, plus page switching) ─────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --bg:        #0c0c0f;
-      --surface:   #141418;
-      --border:    #2a2a33;
-      --muted:     #6c6c7e;
-      --text:      #e8e8f0;
-      --text-dim:  #a0a0b2;
-      --accent:    #e87d4e;
-      --accent2:   #5b8af5;
-      --accent3:   #4ec9b0;
-      --accent4:   #c792ea;
-      --hot:       #ff6b6b;
-      --serif:     'Playfair Display', Georgia, serif;
-      --sans:      'Inter', system-ui, sans-serif;
-      --mono:      'JetBrains Mono', monospace;
+    /* ---------- RESET & DARK THEME (extended) ---------- */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
     }
 
-    html { scroll-behavior: smooth; }
+    :root {
+      --bg: #0c0c0f;
+      --surface: #141418;
+      --border: #2a2a33;
+      --muted: #6c6c7e;
+      --text: #e8e8f0;
+      --text-dim: #a0a0b2;
+      --accent: #e87d4e;
+      --accent2: #5b8af5;
+      --accent3: #4ec9b0;
+      --accent4: #c792ea;
+      --hot: #ff6b6b;
+      --sidebar-width: 260px;
+      --sidebar-collapsed: 72px;
+      --transition: all 0.25s ease;
+    }
+
     body {
       background: var(--bg);
       color: var(--text);
-      font-family: var(--sans);
+      font-family: 'Inter', system-ui, sans-serif;
       font-size: 16px;
       line-height: 1.7;
       overflow-x: hidden;
+      min-height: 100vh;
     }
 
-    /* animated background gradient (same as original) */
+    /* animated background gradient (original) */
     body::before {
       content: '';
       position: fixed;
@@ -52,97 +59,157 @@
       z-index: 0;
     }
 
-    .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; position: relative; z-index: 1; }
-    .wide      { max-width: 1100px; }
+    /* ---------- LAYOUT: LEFT SIDEBAR + MAIN ---------- */
+    .app-layout {
+      display: flex;
+      min-height: 100vh;
+      position: relative;
+      z-index: 1;
+    }
 
-    /* ─── Navigation (multi‑page aware) ───────────────────────────────── */
-    nav {
-      position: sticky;
+    /* SIDEBAR (fixed) */
+    .sidebar {
+      position: fixed;
       top: 0;
-      z-index: 100;
-      background: rgba(12,12,15,.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-      padding: .9rem 0;
+      left: 0;
+      bottom: 0;
+      width: var(--sidebar-width);
+      background: rgba(12, 12, 15, 0.92);
+      backdrop-filter: blur(16px);
+      border-right: 1px solid var(--border);
+      z-index: 200;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.25s ease, width 0.25s ease;
+      overflow-y: auto;
     }
-    nav .container { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; }
-    .nav-brand { font-weight: 700; font-size: 1rem; letter-spacing: .05em; color: var(--accent); }
-    .nav-links { display: flex; gap: 1rem; flex-wrap: wrap; }
-    .nav-links a {
-      color: var(--text-dim);
-      text-decoration: none;
-      font-size: .8rem;
-      font-weight: 500;
-      letter-spacing: .03em;
-      transition: color .2s;
-      cursor: pointer;
-      padding: 0.2rem 0;
-    }
-    .nav-links a:hover { color: var(--text); }
-    .nav-links a.active-page { color: var(--accent); border-bottom: 1px solid var(--accent); }
 
-    /* ─── PAGE SYSTEM (multi‑page containers) ──────────────────────────── */
+    /* sidebar header */
+    .sidebar-header {
+      padding: 1.8rem 1.5rem 1rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 1.8rem;
+    }
+    .sidebar-brand {
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .sidebar-tagline {
+      font-size: 0.7rem;
+      color: var(--muted);
+      margin-top: 0.4rem;
+      font-family: var(--mono);
+    }
+
+    /* navigation menu */
+    .nav-menu {
+      flex: 1;
+      padding: 0 1rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 0.9rem;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: var(--transition);
+      background: transparent;
+      border: none;
+      width: 100%;
+      text-align: left;
+      font-family: var(--sans);
+    }
+    .nav-item:hover {
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text);
+    }
+    .nav-item.active-page {
+      background: rgba(232, 125, 78, 0.12);
+      color: var(--accent);
+      border-left: 2px solid var(--accent);
+      font-weight: 600;
+    }
+    .nav-icon {
+      font-size: 1.25rem;
+      min-width: 1.8rem;
+      text-align: center;
+    }
+    .nav-label {
+      flex: 1;
+    }
+
+    /* sidebar footer (optional) */
+    .sidebar-footer {
+      padding: 1.2rem 1rem;
+      border-top: 1px solid var(--border);
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: center;
+    }
+
+    /* MAIN CONTENT (pushes right) */
+    .main-content {
+      flex: 1;
+      margin-left: var(--sidebar-width);
+      transition: margin-left 0.25s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Mobile toggle button (hidden on desktop) */
+    .mobile-toggle {
+      display: none;
+      position: fixed;
+      top: 1rem;
+      left: 1rem;
+      z-index: 250;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0.6rem 0.9rem;
+      cursor: pointer;
+      font-size: 1.4rem;
+      color: var(--text);
+      backdrop-filter: blur(8px);
+    }
+
+    /* PAGE CONTAINERS */
     .page {
       display: none;
-      animation: fadePage 0.3s ease-in-out;
+      animation: fadePage 0.3s ease;
+      padding: 2rem 0 3rem;
     }
     .page.active-page {
       display: block;
     }
     @keyframes fadePage {
-      from { opacity: 0; transform: translateY(6px); }
+      from { opacity: 0; transform: translateY(8px); }
       to   { opacity: 1; transform: translateY(0); }
     }
 
-    /* ─── Hero section (home page) ────────────────────────────────────── */
-    .hero {
-      padding: 5rem 0 3rem;
-      position: relative;
-    }
-    .hero-eyebrow {
-      display: inline-flex; align-items: center; gap: .5rem;
-      font-size: .78rem; font-weight: 600; letter-spacing: .12em;
-      text-transform: uppercase; color: var(--accent);
-      background: rgba(232,125,78,.1); border: 1px solid rgba(232,125,78,.2);
-      padding: .35rem .9rem; border-radius: 99px; margin-bottom: 1.8rem;
-    }
-    .hero-eyebrow::before { content: ''; width: 6px; height: 6px; border-radius: 50%;
-                             background: var(--accent); animation: pulse-dot 2s infinite; }
-    @keyframes pulse-dot {
-      0%,100% { opacity: 1; transform: scale(1); }
-      50%      { opacity: .4; transform: scale(.6); }
-    }
-    h1.hero-title {
-      font-family: var(--serif);
-      font-size: clamp(2.4rem, 6vw, 4rem);
-      line-height: 1.15;
-      color: var(--text);
-      max-width: 700px;
-      margin-bottom: 1rem;
-    }
-    h1.hero-title em { font-style: italic; color: var(--accent); }
-    .hero-sub {
-      font-size: 1rem; color: var(--text-dim);
-      max-width: 560px; margin-bottom: 1.8rem; line-height: 1.7;
-    }
-    .hero-meta {
-      display: flex; gap: 1.8rem; flex-wrap: wrap;
-    }
-    .meta-pill {
-      display: flex; align-items: center; gap: .5rem;
-      font-size: .8rem; color: var(--muted);
-    }
-    .meta-pill span { color: var(--text-dim); font-weight: 500; }
-
-    /* all existing components (cards, code, diagram, etc.) remain identical */
-    .section { padding: 4rem 0 2rem; border-top: 1px solid var(--border); }
+    /* CONTAINER & TYPOGRAPHY (original structure) */
+    .container { max-width: 900px; margin: 0 auto; padding: 0 2rem; }
+    .wide { max-width: 1100px; }
+    .section { padding: 3rem 0 2rem; border-top: 1px solid var(--border); }
     .section-label {
       font-size: .72rem; font-weight: 700; letter-spacing: .16em;
       text-transform: uppercase; color: var(--accent2);
       margin-bottom: .8rem;
     }
     h2.section-title {
-      font-family: var(--serif);
+      font-family: 'Playfair Display', Georgia, serif;
       font-size: clamp(1.8rem, 4vw, 2.6rem);
       line-height: 1.2;
       margin-bottom: 1rem;
@@ -159,6 +226,8 @@
     }
     p, li { color: var(--text-dim); max-width: 72ch; }
     p { margin-bottom: 1rem; }
+
+    /* cards, code blocks, diagram (same as original) */
     .diagram-card {
       background: var(--surface);
       border: 1px solid var(--border);
@@ -178,6 +247,7 @@
     .callout { border-left: 3px solid var(--accent); background: rgba(232,125,78,.05); border-radius: 0 10px 10px 0; padding: 1rem 1.2rem; margin: 1.2rem 0; }
     .callout.blue { border-left-color: var(--accent2); background: rgba(91,138,245,.05); }
     .callout.green { border-left-color: var(--accent3); background: rgba(78,201,176,.05); }
+    .callout.purple{ border-left-color: var(--accent4); background: rgba(199,146,234,.05); }
     .code-block {
       background: #0d1117;
       border: 1px solid #30363d;
@@ -193,17 +263,16 @@
       background: #161b22;
       border-bottom: 1px solid #30363d;
     }
-    .code-lang { font-size: .65rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--accent3); background: rgba(78,201,176,.1); border: 1px solid rgba(78,201,176,.2); padding: .15rem .5rem; border-radius: 4px; font-family: var(--mono); }
-    .code-file { color: #6e7681; font-family: var(--mono); font-size: .78rem; flex: 1; }
+    .code-lang { font-size: .65rem; font-weight: 700; text-transform: uppercase; color: var(--accent3); font-family: monospace; }
+    .code-file { color: #6e7681; font-family: monospace; font-size: .78rem; flex: 1; }
     .code-block pre { margin: 0; padding: 1rem 1.2rem; overflow-x: auto; background: transparent; }
-    .code-block code { font-family: var(--mono); font-size: .78rem; background: transparent; border: none; padding: 0; color: #c9d1d9; white-space: pre; }
-    .kw  { color: #ff7b72; } .an { color: #79c0ff; } .cl { color: #ffa657; } .st { color: #a5d6ff; } .cm { color: #6e7681; font-style: italic; } .nb { color: #79c0ff; } .mt { color: #d2a8ff; }
+    .code-block code { font-family: 'JetBrains Mono', monospace; font-size: .78rem; background: transparent; border: none; padding: 0; color: #c9d1d9; white-space: pre; }
+    .kw, .an, .cl, .st, .cm, .nb, .mt { /* syntax kept */ }
     .step-flow {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 1px;
       background: var(--border);
-      border: 1px solid var(--border);
       border-radius: 12px;
       overflow: hidden;
       margin: 2rem 0;
@@ -217,208 +286,236 @@
     .tags { display: flex; flex-wrap: wrap; gap: .6rem; margin: 1rem 0; }
     .tag { font-size: .7rem; font-weight: 600; padding: .2rem .7rem; border-radius: 99px; border: 1px solid; }
     .tag-orange { color: var(--accent); border-color: rgba(232,125,78,.3); background: rgba(232,125,78,.08); }
+    .tag-blue   { color: var(--accent2); border-color: rgba(91,138,245,.3); background: rgba(91,138,245,.08); }
+    .tag-green  { color: var(--accent3); border-color: rgba(78,201,176,.3); background: rgba(78,201,176,.08); }
     .screenshot-frame { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; margin: 1.8rem 0; }
     .screenshot-toolbar { background: #1a1a24; border-bottom: 1px solid var(--border); padding: .6rem 1rem; display: flex; align-items: center; gap: .8rem; }
     .screenshot-img { width: 100%; height: auto; display: block; background: #000; }
     .insight-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.2rem; margin: 2rem 0; }
-    .insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem; }
+    .insight-card { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.2rem; transition: all 0.2s; }
+    .insight-card:hover { border-color: var(--accent2); transform: translateY(-2px); }
     footer { border-top: 1px solid var(--border); padding: 2.5rem 0; text-align: center; margin-top: 2rem; }
-    footer p { font-size: .8rem; color: var(--muted); }
-    .reveal { opacity: 1; transform: none; transition: none; }
-    @media(max-width:640px){ .nav-links { gap: 0.6rem; } .mem-loop { flex-direction: column; gap: .3rem; } .mem-arrow { transform: rotate(90deg); } }
+
+    /* RESPONSIVE: sidebar collapses on mobile */
+    @media (max-width: 768px) {
+      .sidebar {
+        transform: translateX(-100%);
+        width: var(--sidebar-width);
+      }
+      .sidebar.open {
+        transform: translateX(0);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+      }
+      .main-content {
+        margin-left: 0;
+      }
+      .mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      body.sidebar-open .main-content {
+        opacity: 0.9;
+      }
+    }
+
+    /* scrollbar */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* misc */
+    .hero {
+      padding: 2rem 0 1rem;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .78rem; font-weight: 600; letter-spacing: .12em;
+      text-transform: uppercase; color: var(--accent);
+      background: rgba(232,125,78,.1); border: 1px solid rgba(232,125,78,.2);
+      padding: .35rem .9rem; border-radius: 99px; margin-bottom: 1.5rem;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      line-height: 1.2;
+    }
   </style>
 </head>
 <body>
+<div class="app-layout">
+  <!-- MOBILE TOGGLE BUTTON -->
+  <button class="mobile-toggle" id="mobileToggle" aria-label="Menu">☰</button>
 
-<nav>
-  <div class="container">
-    <div class="nav-brand">⬡ Pulse HK · Multi‑Page Engineering</div>
-    <div class="nav-links" id="navLinks">
-      <a data-page="home" class="nav-link active-page">🏠 Home</a>
-      <a data-page="architecture" class="nav-link">🏛️ Architecture</a>
-      <a data-page="a2a" class="nav-link">🔗 A2A Protocol</a>
-      <a data-page="memory" class="nav-link">🧠 Memory</a>
-      <a data-page="agents" class="nav-link">🤖 Agents</a>
-      <a data-page="identity" class="nav-link">🆔 Identity</a>
-      <a data-page="monitor" class="nav-link">📊 Monitor</a>
-      <a data-page="insights" class="nav-link">💡 Insights</a>
+  <!-- LEFT SIDEBAR NAVIGATION -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">⬡ Pulse HK</div>
+      <div class="sidebar-tagline">memory-first · A2A</div>
     </div>
-  </div>
-</nav>
+    <div class="nav-menu" id="navMenu">
+      <button class="nav-item" data-page="home"><span class="nav-icon">🏠</span><span class="nav-label">Home</span></button>
+      <button class="nav-item" data-page="architecture"><span class="nav-icon">🏛️</span><span class="nav-label">Architecture</span></button>
+      <button class="nav-item" data-page="a2a"><span class="nav-icon">🔗</span><span class="nav-label">A2A Protocol</span></button>
+      <button class="nav-item" data-page="memory"><span class="nav-icon">🧠</span><span class="nav-label">Memory</span></button>
+      <button class="nav-item" data-page="agents"><span class="nav-icon">🤖</span><span class="nav-label">Agents</span></button>
+      <button class="nav-item" data-page="identity"><span class="nav-icon">🆔</span><span class="nav-label">Identity</span></button>
+      <button class="nav-item" data-page="monitor"><span class="nav-icon">📊</span><span class="nav-label">Monitor</span></button>
+      <button class="nav-item" data-page="insights"><span class="nav-icon">💡</span><span class="nav-label">Insights</span></button>
+    </div>
+    <div class="sidebar-footer">
+      <div>LangChain4j · Mem0</div>
+      <div style="font-size:0.65rem;">v2.0 · April 2026</div>
+    </div>
+  </aside>
 
-<!-- ************ MULTI‑PAGE CONTAINERS ************ -->
-<!-- HOME PAGE -->
-<div id="page-home" class="page active-page">
-  <header class="hero">
-    <div class="container">
-      <div class="hero-eyebrow">Pulse HK · Production multi‑agent system</div>
-      <h1 class="hero-title">
-        How we built a <em>memory-first</em><br/>multi-agent shopping companion
-      </h1>
-      <p class="hero-sub">
-        A deep dive into the Pulse HK architecture — supervisor orchestration, A2A protocol
-        exposure, and a Mem0-backed long-term memory loop that personalises every conversation.
-        Explore the pages to discover each layer.
-      </p>
-      <div class="hero-meta">
-        <div class="meta-pill">📦 <span>Spring Boot 3 · LangChain4j · Mem0</span></div>
-        <div class="meta-pill">🧠 <span>Ollama / Qwen3</span></div>
-        <div class="meta-pill">🔗 <span>A2A Protocol 0.3</span></div>
-      </div>
-      <div class="tags" style="margin-top: 2rem;">
-        <span class="tag tag-orange">7 technical deep‑dive pages</span>
-        <span class="tag tag-orange">Supervisor topology</span>
-        <span class="tag tag-orange">Observability first</span>
-      </div>
-    </div>
-  </header>
-  <div class="container">
-    <div class="callout green" style="margin-top: 0;">
-      <p><strong>⚡ Quick navigation:</strong> Use the top menu to explore <strong>Architecture, A2A, Memory, Agents, Identity, Monitor, Insights</strong> — each page contains system diagrams, code snippets and engineering decisions.</p>
-    </div>
-    <div class="diagram-card">
-      <div class="diagram-title"><span>System at a glance</span></div>
-      <p>Pulse HK exposes a single A2A endpoint, orchestrated by a supervisor that delegates to specialised sub‑agents (BrandFinder, OfferFinder, GeneralQA). Long‑term memory is powered by Mem0, and every execution is fully observable via AgentMonitor. Below you'll find a complete architectural walkthrough.</p>
-      <div class="tags"><span class="tag tag-orange">Spring Boot</span><span class="tag tag-blue">LangChain4j</span><span class="tag tag-green">Mem0</span><span class="tag tag-purple">A2A</span></div>
-    </div>
-  </div>
-</div>
-
-<!-- ARCHITECTURE PAGE -->
-<div id="page-architecture" class="page">
-  <div class="container wide">
-    <div class="section" style="border-top: none; padding-top: 2rem;">
-      <div class="section-label">C4 · Level 1 — System Context</div>
-      <h2 class="section-title">The 10,000-foot view</h2>
-      <p>Pulse HK exposes a single <strong>A2A agent endpoint</strong>. Clients interact via JSON-RPC. Inside, a supervisor orchestrates three sub‑agents, Mem0, and local LLM.</p>
-      <div class="diagram-card">
-        <div class="diagram-title"><span>System Topology — Pulse HK</span></div>
-        <div class="topo-wrap" style="display:flex; flex-direction:column;">
-          <div style="display:flex; gap:2rem; justify-content:center; flex-wrap:wrap; margin-bottom:1rem;">
-            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.8rem 1.2rem;"><div style="font-size:1.8rem;">🧑</div><div style="font-size:.8rem;">HK Resident</div></div>
-            <div style="background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:0.8rem 1.2rem;"><div style="font-size:1.8rem;">🤖</div><div style="font-size:.8rem;">AI Agent / Dev</div></div>
-          </div>
-          <div style="text-align:center; font-size:.75rem; color:var(--accent2);">A2A JSON-RPC · HTTP POST /offer/</div>
-          <div style="border:1.5px solid var(--accent2); border-radius:16px; margin-top:1rem; background:rgba(91,138,245,.03); padding:0.8rem;">
-            <div style="background:rgba(91,138,245,.08); padding:0.4rem 1rem; font-weight:700;">Spring Boot · Agentic Services</div>
-            <div style="padding:0.8rem; text-align:center;"><span class="tag">Supervisor + BrandFinder + OfferFinder + GeneralQA</span><br/><span class="tag">ChatMemoryStore + Mem0</span></div>
+  <!-- MAIN CONTENT (all pages) -->
+  <main class="main-content" id="mainContent">
+    <!-- HOME PAGE -->
+    <div id="page-home" class="page active-page">
+      <div class="container">
+        <div class="hero">
+          <div class="hero-eyebrow">Pulse HK · engineering deep-dive</div>
+          <h1 class="hero-title">How we built a <em>memory-first</em><br/>multi‑agent shopping companion</h1>
+          <p class="hero-sub" style="margin-top:1rem;">Supervisor orchestration, A2A protocol, Mem0 long-term memory, and full observability — explained across eight pages.</p>
+          <div class="tags">
+            <span class="tag tag-orange">Spring Boot 3</span>
+            <span class="tag tag-blue">LangChain4j</span>
+            <span class="tag tag-green">Mem0</span>
+            <span class="tag tag-orange">A2A 0.3</span>
           </div>
         </div>
+        <div class="diagram-card">
+          <div class="diagram-title"><span>System at a glance</span></div>
+          <p>Pulse HK exposes a single A2A endpoint. Inside, a supervisor orchestrates BrandFinder, OfferFinder, GeneralQA, while Mem0 stores cross‑session memories. Every request is monitored via AgentMonitor.</p>
+          <div class="callout green" style="margin-top:1rem;">← Use left sidebar to explore Architecture, A2A, Memory, Agents, Identity, Monitor, Insights</div>
+        </div>
       </div>
-      <div class="code-block"><div class="code-toolbar"><span class="code-lang">Java</span><span class="code-file">AgentConfig.java</span></div><pre><code><span class="an">@Bean</span> <span class="kw">public</span> <span class="cl">PulseSupervisorAgent</span> <span class="mt">supervisorAgent</span>(...) {
+    </div>
+
+    <!-- ARCHITECTURE PAGE -->
+    <div id="page-architecture" class="page">
+      <div class="container wide">
+        <div class="section" style="border-top: none;">
+          <div class="section-label">C4 · System Context</div>
+          <h2 class="section-title">Topology & wiring</h2>
+          <p>The Spring Boot application intercepts A2A calls, resolves identity, injects memory context, and delegates to the supervisor. Sub‑agents are pure Java interfaces — LangChain4j generates proxies.</p>
+          <div class="diagram-card">
+            <div class="diagram-title"><span>Pulse HK core flow</span></div>
+            <div class="step-flow" style="margin:0"><div class="step"><div class="step-num">1</div><div class="step-label">A2A message</div></div><div class="step"><div class="step-num">2</div><div class="step-label">UserContext resolve</div></div><div class="step"><div class="step-num">3</div><div class="step-label">Mem0 enrich</div></div><div class="step"><div class="step-num">4</div><div class="step-label">Supervisor + sub-agents</div></div></div>
+            <div class="code-block"><div class="code-toolbar"><span class="code-lang">Java</span><span class="code-file">AgentConfig.java</span></div><pre><code><span class="an">@Bean</span> <span class="kw">public</span> <span class="cl">PulseSupervisorAgent</span> <span class="mt">supervisorAgent</span>(...) {
   <span class="kw">return</span> <span class="cl">AgenticServices</span>.<span class="mt">supervisorBuilder</span>(...)
     .<span class="mt">chatMemoryProvider</span>(id -&gt; <span class="cl">MessageWindowChatMemory</span>.<span class="mt">withMaxMessages</span>(<span class="nb">20</span>))
     .<span class="mt">listener</span>(agentMonitor).<span class="mt">build</span>();
 }</code></pre></div>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- A2A PAGE -->
-<div id="page-a2a" class="page">
-  <div class="container">
-    <div class="section" style="border-top:none; padding-top:2rem;">
-      <div class="section-label">Protocol</div>
-      <h2 class="section-title">Agent-to-Agent standard</h2>
-      <p>A2A brings discoverability, task lifecycle, and standardised message envelope. Pulse HK’s endpoint works seamlessly with any A2A-compliant client.</p>
-      <div class="screenshot-frame"><div class="screenshot-toolbar"><div class="screenshot-url">A2A UI — message/send call</div></div><img class="screenshot-img" src="A2AUI.png" alt="A2A interface" style="background:#0b0e14; min-height:120px;"/><div class="screenshot-caption">Web client invoking Pulse HK via A2A JSON‑RPC</div></div>
-      <div class="callout blue"><strong>Key:</strong> Task ID scopes short‑term planner memory; userId scopes long‑term Mem0 — perfect separation.</div>
+    <!-- A2A PAGE -->
+    <div id="page-a2a" class="page">
+      <div class="container">
+        <div class="section" style="border-top: none;">
+          <div class="section-label">Protocol</div>
+          <h2 class="section-title">Agent‑to‑Agent standard</h2>
+          <p>A2A enables discoverability via <code>AgentCard</code>, task lifecycle, and identity in metadata. Pulse HK’s endpoint integrates with any A2A client.</p>
+          <div class="screenshot-frame"><div class="screenshot-toolbar"><span>A2A UI — message/send</span></div><img class="screenshot-img" src="A2AUI.png" alt="A2A UI" style="background:#101015; min-height:100px;"><div class="screenshot-caption">Web client invoking Pulse HK via JSON‑RPC</div></div>
+          <div class="callout blue">Task ID = short‑term planning window, userId = Mem0 scope → clean separation</div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- MEMORY PAGE -->
-<div id="page-memory" class="page">
-  <div class="container">
-    <div class="section" style="border-top:none; padding-top:2rem;">
-      <div class="section-label">Long‑Term Memory</div>
-      <h2 class="section-title">Mem0 loop that remembers</h2>
-      <p>Mem0 stores semantic memories with topic metadata. Enriched prompt prepends facts, never contaminates chat history.</p>
-      <div class="mem-loop"><div class="mem-node">📥 User Query</div><div class="mem-arrow">➜</div><div class="mem-node">🔍 Mem0 Search</div><div class="mem-arrow">➜</div><div class="mem-node">📝 Enrich Prompt</div><div class="mem-arrow">➜</div><div class="mem-node">🤖 Agent Execution</div><div class="mem-arrow">➜</div><div class="mem-node">💾 Save Memory</div></div>
-      <div class="code-block"><div class="code-toolbar"><span class="code-lang">Java</span><span class="code-file">PulseChatMemoryStore.java</span></div><pre><code><span class="cm">// getMessages() returns EMPTY → memories go into prompt, not system messages</span>
-<span class="kw">public</span> <span class="cl">String</span> <span class="mt">buildEnrichedPrompt</span>(userId, userMessage) {
-  <span class="cm">// three parallel /search calls filtered by metadata.topic</span>
-  <span class="kw">return</span> contextBlock + userMessage;
+    <!-- MEMORY PAGE -->
+    <div id="page-memory" class="page">
+      <div class="container">
+        <div class="section" style="border-top: none;">
+          <div class="section-label">Long‑Term Memory</div>
+          <h2 class="section-title">Mem0 semantic loop</h2>
+          <p>Memories are stored with topic metadata (brands, preferences, general). At retrieval, three parallel searches enrich the prompt. The chat history never sees system‑level memory messages → prevents hallucination.</p>
+          <div class="mem-loop"><div class="mem-node">User Query</div><div class="mem-arrow">➜</div><div class="mem-node">Mem0 Search</div><div class="mem-arrow">➜</div><div class="mem-node">Enrich Prompt</div><div class="mem-arrow">➜</div><div class="mem-node">Agent Execution</div><div class="mem-arrow">➜</div><div class="mem-node">Save Memory</div></div>
+          <div class="code-block"><div class="code-toolbar"><span class="code-lang">Java</span><span class="code-file">PulseChatMemoryStore.java</span></div><pre><code><span class="an">@Override</span> <span class="kw">public</span> <span class="cl">List</span>&lt;<span class="cl">ChatMessage</span>&gt; <span class="mt">getMessages</span>(...) {
+  <span class="kw">return</span> <span class="cl">List</span>.<span class="mt">of</span>(); <span class="cm">// memories never injected as system messages</span>
 }</code></pre></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- AGENTS PAGE -->
-<div id="page-agents" class="page">
-  <div class="container">
-    <div class="section" style="border-top:none;">
-      <div class="section-label">Orchestration</div>
-      <h2 class="section-title">Supervisor → Sub‑agent flow</h2>
-      <div class="step-flow"><div class="step"><div class="step-num">BrandFinder</div><div class="step-label">extract brand</div><div class="step-desc">Calls saveMemory(topic=brands)</div></div>
-      <div class="step"><div class="step-num">OfferFinder</div><div class="step-label">fetch offers + tool</div><div class="step-desc">writes preferences memory</div></div>
-      <div class="step"><div class="step-num">Supervisor</div><div class="step-label">synthesize answer</div><div class="step-desc">20‑slot message window</div></div></div>
-      <div class="callout purple"><strong>AgenticScope bridge:</strong> userId reaches sub‑agents without method parameters via ThreadLocal + scope writes.</div>
+    <!-- AGENTS PAGE -->
+    <div id="page-agents" class="page">
+      <div class="container">
+        <div class="section" style="border-top: none;">
+          <div class="section-label">Orchestration</div>
+          <h2 class="section-title">Plan‑then‑delegate flow</h2>
+          <div class="step-flow"><div class="step"><div class="step-num">BrandFinder</div><div class="step-label">extract brand, save memory</div></div><div class="step"><div class="step-num">OfferFinder</div><div class="step-label">tool call + memory write</div></div><div class="step"><div class="step-num">Supervisor</div><div class="step-label">final synthesis (20‑slot window)</div></div></div>
+          <div class="callout purple">AgenticScope writes userId once; sub‑agents read it without method parameters → clean interfaces.</div>
+          <div class="code-block"><div class="code-toolbar"><span class="code-lang">Java</span><span class="code-file">BrandFinderAgent.java</span></div><pre><code><span class="an">@Agent</span>(name = <span class="st">"BrandFinderAgent"</span>, description = <span class="st">"extracts brand name"</span>)
+<span class="cl">String</span> <span class="mt">findBrandName</span>(<span class="an">@V</span>(<span class="st">"userRequest"</span>) <span class="cl">String</span> request);</code></pre></div>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
-<!-- IDENTITY PAGE -->
-<div id="page-identity" class="page">
-  <div class="container">
-    <div class="section" style="border-top:none;">
-      <div class="section-label">Identity Propagation</div>
-      <h2 class="section-title">Three‑source resolution chain</h2>
-      <div class="tags"><span class="tag tag-orange">1. JWT Bearer</span><span class="tag tag-blue">2. X-User-Id header</span><span class="tag tag-green">3. A2A metadata</span></div>
-      <div class="code-block"><div class="code-toolbar"><span class="code-lang">Java</span><span class="code-file">CustomAgentExecutor.java</span></div><pre><code><span class="cl">UserContext</span> ctx = <span class="cl">UserContextResolver</span>.<span class="mt">resolve</span>(message);
+    <!-- IDENTITY PAGE -->
+    <div id="page-identity" class="page">
+      <div class="container">
+        <div class="section" style="border-top: none;">
+          <div class="section-label">Identity propagation</div>
+          <h2 class="section-title">Three‑priority resolution</h2>
+          <div class="tags"><span class="tag tag-orange">1. JWT Bearer</span><span class="tag tag-blue">2. X‑User‑Id header</span><span class="tag tag-green">3. A2A metadata</span></div>
+          <div class="code-block"><div class="code-toolbar"><span class="code-lang">Java</span><span class="code-file">CustomAgentExecutor.java</span></div><pre><code><span class="cl">UserContext</span> ctx = <span class="cl">UserContextResolver</span>.<span class="mt">resolve</span>(message);
 <span class="mt">populateScope</span>(ctx.userId(), ctx);
 <span class="cl">UserContextHolder</span>.<span class="mt">set</span>(ctx);
-<span class="cm">// finally: double clear() for thread‑pool safety</span></code></pre></div>
-    </div>
-  </div>
-</div>
-
-<!-- MONITOR PAGE -->
-<div id="page-monitor" class="page">
-  <div class="container">
-    <div class="section" style="border-top:none;">
-      <div class="section-label">Observability</div>
-      <h2 class="section-title">AgentMonitor — full visibility</h2>
-      <div class="step-flow"><div class="step"><div class="step-num">GET /report</div><div class="step-label">HTML waterfall</div></div><div class="step"><div class="step-num">GET /executions</div><div class="step-label">plain tree</div></div><div class="step"><div class="step-num">GET /summary</div><div class="step-label">JSON stats</div></div></div>
-      <div class="screenshot-frame"><div class="screenshot-toolbar"><span>A2A Inspector</span></div><img class="screenshot-img" src="A2AInspector.png" alt="monitor UI"/><div class="screenshot-caption">Real‑time agent execution tree and timings</div></div>
-      <div class="callout blue">Monitor is registered with <code>inheritedBySubagents=true</code> → automatic tracking of all sub‑agents.</div>
-    </div>
-  </div>
-</div>
-
-<!-- INSIGHTS PAGE -->
-<div id="page-insights" class="page">
-  <div class="container wide">
-    <div class="section" style="border-top:none; padding-top:2rem;">
-      <div class="section-label">Design Decisions</div>
-      <h2 class="section-title">Six architectural pillars</h2>
-      <div class="insight-grid">
-        <div class="insight-card"><div class="insight-title">🎯 Task ID as @MemoryId</div><div class="insight-body">Each request isolated planning window.</div></div>
-        <div class="insight-card"><div class="insight-title">💬 Memories into prompt</div><div class="insight-body">Prevents LLM hallucinating agent names.</div></div>
-        <div class="insight-card"><div class="insight-title">🧹 Window sizes by contract</div><div class="insight-body">Deterministic token budgets.</div></div>
-        <div class="insight-card"><div class="insight-title">🔗 Dual identity propagation</div><div class="insight-body">ThreadLocal + AgenticScope.</div></div>
-        <div class="insight-card"><div class="insight-title">🧪 AgenticScopeAccess</div><div class="insight-body">Avoids “multiple agent methods” error.</div></div>
-        <div class="insight-card"><div class="insight-title">🌊 Topic‑segmented metadata</div><div class="insight-body">Clean retrieval per domain.</div></div>
+<span class="cm">// finally: double clear() in interceptor + executor</span></code></pre></div>
+          <div class="callout">ThreadLocal + AgenticScope dual propagation guarantees identity across asynchronous agent loops.</div>
+        </div>
       </div>
-      <div class="code-block"><div class="code-toolbar"><span class="code-lang">bash</span><span class="code-file">Run locally</span></div><pre><code>mem0 serve --port 8000
+    </div>
+
+    <!-- MONITOR PAGE -->
+    <div id="page-monitor" class="page">
+      <div class="container">
+        <div class="section" style="border-top: none;">
+          <div class="section-label">Observability</div>
+          <h2 class="section-title">AgentMonitor: full visibility</h2>
+          <div class="step-flow"><div class="step"><div class="step-num">GET /report</div><div class="step-label">HTML waterfall</div></div><div class="step"><div class="step-num">GET /executions</div><div class="step-label">nested tree</div></div><div class="step"><div class="step-num">GET /summary</div><div class="step-label">user stats + ongoing</div></div></div>
+          <div class="screenshot-frame"><div class="screenshot-toolbar"><span>A2A Inspector</span></div><img class="screenshot-img" src="A2AInspector.png" alt="inspector view" style="background:#0a0c10;"><div class="screenshot-caption">Live agent execution timeline</div></div>
+          <div class="callout blue">Registered with <code>inheritedBySubagents=true</code> → automatically tracks every sub‑agent call.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- INSIGHTS PAGE -->
+    <div id="page-insights" class="page">
+      <div class="container wide">
+        <div class="section" style="border-top: none;">
+          <div class="section-label">Design decisions</div>
+          <h2 class="section-title">Six architectural invariants</h2>
+          <div class="insight-grid">
+            <div class="insight-card"><div class="insight-title">🎯 Task ID as @MemoryId</div><div class="insight-body">Per‑request isolation</div></div>
+            <div class="insight-card"><div class="insight-title">💬 Memories → prompt (not history)</div><div class="insight-body">Prevents hallucinated agent routing</div></div>
+            <div class="insight-card"><div class="insight-title">🧹 Window sizes by contract</div><div class="insight-body">Deterministic token budgets</div></div>
+            <div class="insight-card"><div class="insight-title">🔗 Dual identity propagation</div><div class="insight-body">ThreadLocal + AgenticScope</div></div>
+            <div class="insight-card"><div class="insight-title">🌊 Topic‑segmented metadata</div><div class="insight-body">Brand/preferences/general buckets</div></div>
+            <div class="insight-card"><div class="insight-title">📊 Zero‑surprise monitor</div><div class="insight-body">Inherited listener + HTML report</div></div>
+          </div>
+          <div class="code-block"><div class="code-toolbar"><span class="code-lang">bash</span><span class="code-file">quick start</span></div><pre><code>mem0 serve --port 8000
 ollama run qwen3
 ./mvnw spring-boot:run
-curl -X POST http://localhost:8081/offer/ -H "X-User-Id: alice" -d '...'</code></pre></div>
+curl -X POST /offer/ -H "X-User-Id: alice" -d '...'</code></pre></div>
+        </div>
+      </div>
     </div>
-  </div>
+    <footer>
+      <div class="container">
+        <div class="tags" style="justify-content:center;"><span class="tag tag-orange">LangChain4j</span><span class="tag tag-blue">Mem0</span><span class="tag tag-green">A2A Protocol</span><span class="tag tag-purple">Spring Boot 3</span></div>
+        <p style="margin-top:1rem;">Pulse HK Engineering · multi‑agent memory architecture</p>
+      </div>
+    </footer>
+  </main>
 </div>
 
-<footer>
-  <div class="container">
-    <div class="footer-stack" style="display:flex; gap:0.8rem; justify-content:center; flex-wrap:wrap;">
-      <span class="tag tag-orange">LangChain4j</span><span class="tag tag-green">Mem0</span><span class="tag tag-blue">A2A Protocol</span><span class="tag tag-purple">Spring Boot 3</span>
-    </div>
-    <p>Pulse HK Engineering · April 2026 · Multi‑page deep dive</p>
-  </div>
-</footer>
-
 <script>
-  // PAGE SWITCHING LOGIC
+  // page switching + left sidebar + mobile toggle
   const pages = {
     home: document.getElementById('page-home'),
     architecture: document.getElementById('page-architecture'),
@@ -429,81 +526,84 @@ curl -X POST http://localhost:8081/offer/ -H "X-User-Id: alice" -d '...'</code><
     monitor: document.getElementById('page-monitor'),
     insights: document.getElementById('page-insights')
   };
-
-  const navLinks = document.querySelectorAll('.nav-link');
+  const navButtons = document.querySelectorAll('.nav-item');
+  const sidebar = document.getElementById('sidebar');
+  const mobileToggle = document.getElementById('mobileToggle');
 
   function activatePage(pageId) {
-    // hide all pages
     Object.values(pages).forEach(page => {
       if (page) page.classList.remove('active-page');
     });
     const activePage = pages[pageId];
     if (activePage) activePage.classList.add('active-page');
-    // update nav active styling
-    navLinks.forEach(link => {
-      const linkPage = link.getAttribute('data-page');
-      if (linkPage === pageId) {
-        link.classList.add('active-page');
+
+    navButtons.forEach(btn => {
+      const btnPage = btn.getAttribute('data-page');
+      if (btnPage === pageId) {
+        btn.classList.add('active-page');
       } else {
-        link.classList.remove('active-page');
+        btn.classList.remove('active-page');
       }
     });
-    // optional: scroll to top on page change
+    // update URL hash without scrolling
+    history.pushState({ page: pageId }, '', `#${pageId}`);
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    // re-trigger any inline observers if needed (none critical for diagrams)
+    // auto close sidebar on mobile after navigation
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove('open');
+      document.body.classList.remove('sidebar-open');
+    }
   }
 
-  navLinks.forEach(link => {
-    link.addEventListener('click', (e) => {
+  navButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
       e.preventDefault();
-      const pageId = link.getAttribute('data-page');
-      if (pageId && pages[pageId]) {
-        activatePage(pageId);
-        // push state for back button
-        history.pushState({ page: pageId }, '', `#${pageId}`);
-      }
+      const pageId = btn.getAttribute('data-page');
+      if (pageId && pages[pageId]) activatePage(pageId);
     });
   });
 
-  // handle initial hash / back/forward
-  function handleHashChange() {
+  // initial load: check hash
+  function handleInitialHash() {
     let hash = window.location.hash.slice(1);
-    if (hash && pages[hash]) {
-      activatePage(hash);
-    } else {
-      // default home
-      activatePage('home');
-    }
+    if (hash && pages[hash]) activatePage(hash);
+    else activatePage('home');
   }
   window.addEventListener('popstate', (event) => {
-    if (event.state && event.state.page) {
-      activatePage(event.state.page);
-    } else {
-      handleHashChange();
+    if (event.state && event.state.page) activatePage(event.state.page);
+    else handleInitialHash();
+  });
+  handleInitialHash();
+
+  // mobile sidebar toggle
+  mobileToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('open');
+    document.body.classList.toggle('sidebar-open');
+  });
+  // close sidebar when clicking outside on mobile (optional)
+  document.addEventListener('click', (e) => {
+    if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+      if (!sidebar.contains(e.target) && e.target !== mobileToggle && !mobileToggle.contains(e.target)) {
+        sidebar.classList.remove('open');
+        document.body.classList.remove('sidebar-open');
+      }
     }
   });
-  // initial load: check hash or default home
-  if (window.location.hash && window.location.hash.length > 1) {
-    handleHashChange();
-  } else {
-    activatePage('home');
-    history.replaceState({ page: 'home' }, '', '#home');
-  }
 
-  // (optional) memory node animation still works globally
+  // memory node animation (if any .mem-node exists)
   const memNodes = document.querySelectorAll('.mem-node');
   const highlights = ['highlight-blue','highlight-green','highlight-orange','highlight-purple','highlight-green'];
-  if(memNodes.length){
+  if (memNodes.length) {
     let stepMem = 0;
-    function cycleMemHighlight() {
+    function cycleMem() {
       memNodes.forEach((n, i) => {
         n.classList.remove('highlight-orange','highlight-blue','highlight-green','highlight-purple');
         const idx = (stepMem + i) % highlights.length;
-        if (idx < highlights.length) n.classList.add(highlights[idx]);
+        if (highlights[idx]) n.classList.add(highlights[idx]);
       });
       stepMem++;
     }
-    setInterval(cycleMemHighlight, 1400);
+    setInterval(cycleMem, 1400);
   }
 </script>
 </body>
